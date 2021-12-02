@@ -80,4 +80,25 @@ public class AdventService {
         System.out.println("Increase sum = " + increaseWindowSum);
     }
 
+    @GET
+    @Path("/2/1")
+    public void advent21() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("2.txt"));
+
+        int x = 0;
+        int y = 0;
+        String command;
+
+        while (scanner.hasNext()) {
+            command = scanner.next();
+            switch (command) {
+                case "forward" -> x += scanner.nextInt();
+                case "down" -> y += scanner.nextInt();
+                case "up" -> y -= scanner.nextInt();
+            }
+        }
+
+        System.out.println("Position is " + x * y);
+    }
+
 }

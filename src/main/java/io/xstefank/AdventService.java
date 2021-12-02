@@ -101,4 +101,33 @@ public class AdventService {
         System.out.println("Position is " + x * y);
     }
 
+    @GET
+    @Path("/2/2")
+    public void advent22() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("2.txt"));
+
+        int x = 0;
+        int y = 0;
+        int aim = 0;
+        String command;
+        int units = 0;
+
+        while (scanner.hasNext()) {
+            command = scanner.next();
+            units = scanner.nextInt();
+
+            switch (command) {
+                case "forward" -> {
+                    x += units;
+                    y += aim * units;
+                }
+                case "down" -> aim += units;
+                case "up" -> aim -= units;
+            }
+        }
+
+        System.out.println("Position is " + x * y);
+    }
+
+
 }

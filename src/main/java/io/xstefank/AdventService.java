@@ -6,6 +6,7 @@ import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -127,6 +128,41 @@ public class AdventService {
         }
 
         System.out.println("Position is " + x * y);
+    }
+
+    @GET
+    @Path("/3/1")
+    public void advent31() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("3.txt"));
+
+        int size = 12;
+
+        int[] onesCount = new int[size];
+        int allCount = 0;
+        String current;
+        char c;
+
+        while (scanner.hasNext()) {
+            allCount++;
+            current = scanner.next();
+            for (int i = 0; i < current.length(); i++) {
+                c = current.charAt(i);
+                if (c == '1') {
+                    onesCount[i]++;
+                }
+            }
+        }
+
+        StringBuilder gammaBinaryStringBuilder = new StringBuilder("");
+        StringBuilder epsilonBinaryStringBuilder = new StringBuilder("");
+        int halfCount = allCount / 2;
+
+        for (int i = 0; i < size; i++) {
+            gammaBinaryStringBuilder.append(onesCount[i] > halfCount ? "1" : "0");
+            epsilonBinaryStringBuilder.append(onesCount[i] > halfCount ? "0" : "1");
+        }
+
+        System.out.println(Long.parseLong(gammaBinaryStringBuilder.toString(), 2) * Long.parseLong(epsilonBinaryStringBuilder.toString(), 2));
     }
 
 

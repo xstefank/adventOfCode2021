@@ -289,6 +289,57 @@ public class AdventService {
 
     }
 
+    @GET
+    @Path("/4/2")
+    public void advent42() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("4.txt"));
+
+        String numbersLine = scanner.nextLine();
+        Queue<Integer> toCallNumbers = new ArrayDeque<>(Arrays.stream(numbersLine.split(",")).map(Integer::parseInt).toList());
+
+        int boardSize = 5;
+        List<Board> boards = new ArrayList<>();
+
+        while (scanner.hasNext()) {
+            Board board = new Board();
+            for (int i = 0; i < boardSize; i++) {
+                for (int j = 0; j < boardSize; j++) {
+                    board.board[i][j] = scanner.nextInt();
+                }
+            }
+            boards.add(board);
+        }
+
+        int playedNumber = 0;
+        Board lastWinningBoard = null;
+        int lastWinningNumber = 0;
+
+        while (!toCallNumbers.isEmpty() && !boards.isEmpty()) {
+            playedNumber = toCallNumbers.poll();
+
+            for (Iterator<Board> iter = boards.iterator(); iter.hasNext(); ) {
+                Board b = iter.next();
+                if (b.play(playedNumber)) {
+                    lastWinningBoard = b;
+                    lastWinningNumber = playedNumber;
+                    iter.remove();
+                }
+            }
+        }
+
+        int sumOfUnmarked = 0;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (!lastWinningBoard.marks[i][j]) {
+                    sumOfUnmarked += lastWinningBoard.board[i][j];
+                }
+            }
+        }
+
+        System.out.println(sumOfUnmarked * lastWinningNumber);
+
+    }
+
     private class Board {
         public int[][] board = new int[5][5];
         public boolean[][] marks = new boolean[5][5];

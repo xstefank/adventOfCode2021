@@ -383,4 +383,73 @@ public class AdventService {
             return false;
         }
     }
+
+    @GET
+    @Path("/5/1")
+    public void advent51() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("5.txt"));
+
+        int[][] ventMap = new int[1_000][1_000];
+
+        while (scanner.hasNext()) {
+            Vent vent = new Vent(scanner.nextLine());
+
+            if (vent.x1 == vent.x2) {
+                if (vent.y1 < vent.y2) {
+                    for (int j = vent.y1; j <= vent.y2; j++) {
+                        ventMap[vent.x1][j]++;
+                    }
+                } else if (vent.y1 > vent.y2) {
+                    for (int j = vent.y2; j <= vent.y1; j++) {
+                        ventMap[vent.x1][j]++;
+                    }
+                } else {
+                    ventMap[vent.x1][vent.y1]++;
+                }
+            } else if (vent.y1 == vent.y2) {
+                if (vent.x1 < vent.x2) {
+                    for (int i = vent.x1; i <= vent.x2; i++) {
+                        ventMap[i][vent.y1]++;
+                    }
+                } else if (vent.x1 > vent.x2) {
+                    for (int i = vent.x2; i <= vent.x1; i++) {
+                        ventMap[i][vent.y1]++;
+                    }
+                } else {
+                    ventMap[vent.x1][vent.y1]++;
+                }
+            }
+        }
+
+        int count = 0;
+
+        for (int i = 0; i < 1_000; i++) {
+            for (int j = 0; j < 1_000; j++) {
+                if (ventMap[i][j] >= 2) {
+                    count++;
+                }
+            }
+        }
+
+        System.out.println(count);
+
+    }
+
+    private final static class Vent {
+        public int x1;
+        public int y1;
+        public int x2;
+        public int y2;
+
+        public Vent(String inputLine) {
+            String[] split = inputLine.split(" -> ");
+            String[] split1 = split[0].split(",");
+            x1 = Integer.parseInt(split1[0]);
+            y1 = Integer.parseInt(split1[1]);
+            String[] split2 = split[1].split(",");
+            x2 = Integer.parseInt(split2[0]);
+            y2 = Integer.parseInt(split2[1]);
+        }
+    }
+
 }

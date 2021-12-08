@@ -435,6 +435,88 @@ public class AdventService {
 
     }
 
+    @GET
+    @Path("/5/2")
+    public void advent52() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("5.txt"));
+
+        int[][] ventMap = new int[1_000][1_000];
+
+        while (scanner.hasNext()) {
+            Vent vent = new Vent(scanner.nextLine());
+
+            if (vent.x1 == vent.x2) {
+                if (vent.y1 < vent.y2) {
+                    for (int j = vent.y1; j <= vent.y2; j++) {
+                        ventMap[j][vent.x1]++;
+                    }
+                } else if (vent.y1 > vent.y2) {
+                    for (int j = vent.y2; j <= vent.y1; j++) {
+                        ventMap[j][vent.x1]++;
+                    }
+                } else {
+                    ventMap[vent.x1][vent.y1]++;
+                }
+            } else if (vent.y1 == vent.y2) {
+                if (vent.x1 < vent.x2) {
+                    for (int i = vent.x1; i <= vent.x2; i++) {
+                        ventMap[vent.y1][i]++;
+                    }
+                } else if (vent.x1 > vent.x2) {
+                    for (int i = vent.x2; i <= vent.x1; i++) {
+                        ventMap[vent.y1][i]++;
+                    }
+                } else {
+                    ventMap[vent.x1][vent.y1]++;
+                }
+            } else if (Math.abs(vent.x1 - vent.x2) == Math.abs(vent.y1 - vent.y2)) {
+                if (vent.x1 < vent.x2) {
+                    if (vent.y1 < vent.y2) {
+                        for (int i = 0; i <= vent.x2 - vent.x1; i++) {
+                            ventMap[vent.y1 + i][vent.x1 + i]++;
+                        }
+                    } else {
+                        for (int i = 0; i <= vent.x2 - vent.x1; i++) {
+                            ventMap[vent.y1 - i][vent.x1 + i]++;
+                        }
+                    }
+                } else {
+                    if (vent.y1 < vent.y2) {
+                        for (int i = 0; i <= vent.x1 - vent.x2; i++) {
+                            ventMap[vent.y1 + i][vent.x1 - i]++;
+                        }
+                    } else {
+                        for (int i = 0; i <= vent.x1 - vent.x2; i++) {
+                            ventMap[vent.y1 - i][vent.x1 - i]++;
+                        }
+                    }
+                }
+            }
+        }
+
+        int count = 0;
+
+        for (int i = 0; i < 1_000; i++) {
+            for (int j = 0; j < 1_000; j++) {
+                if (ventMap[i][j] >= 2) {
+                    count++;
+                }
+            }
+        }
+
+        System.out.println(count);
+
+        for (int i = 0; i < 10; i++) {
+            System.out.print("   ");
+            for (int j = 0; j < 10; j++) {
+                System.out.print(ventMap[i][j] == 0 ? "." : ventMap[i][j]);
+            }
+            System.out.println();
+        }
+
+    }
+
+
     private final static class Vent {
         public int x1;
         public int y1;

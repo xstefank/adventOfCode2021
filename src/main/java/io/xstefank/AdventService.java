@@ -5,6 +5,7 @@ import io.xstefank.util.InputReader;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -566,6 +567,40 @@ public class AdventService {
         }
 
         System.out.println(lanternFish.length);
+    }
+
+    @GET
+    @Path("/6/2")
+    public void advent62() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("6.txt"));
+
+        int numOfDays = 256;
+        final long[] lanternFish = new long[9];
+
+        Arrays.stream(scanner.nextLine().split(",")).mapToInt(Integer::parseInt)
+            .forEachOrdered(i -> lanternFish[i]++);
+
+        long toAddCount;
+
+        for (int day = 1; day <= numOfDays; day++) {
+            toAddCount = lanternFish[0];
+
+            for (int i = 1; i < lanternFish.length; i++) {
+                lanternFish[i - 1] = lanternFish[i];
+            }
+            lanternFish[8] = 0;
+
+            lanternFish[6] += toAddCount;
+            lanternFish[8] += toAddCount;
+        }
+
+        long sum = 0;
+
+        for (int i = 0; i < lanternFish.length; i++) {
+            sum += lanternFish[i];
+        }
+
+        System.out.println(sum);
     }
 
 }

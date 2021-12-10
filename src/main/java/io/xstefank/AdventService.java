@@ -534,4 +534,38 @@ public class AdventService {
         }
     }
 
+    @GET
+    @Path("/6/1")
+    public void advent61() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("6.txt"));
+
+        int[] lanternFish = Arrays.stream(scanner.nextLine().split(",")).mapToInt(Integer::parseInt).toArray();
+
+        int numOfDays = 80;
+        int toAddCount;
+
+        for (int day = 1; day <= numOfDays; day++) {
+            toAddCount = 0;
+
+            for (int i = 0; i < lanternFish.length; i++) {
+                if (--lanternFish[i] < 0) {
+                    toAddCount++;
+                    lanternFish[i] = 6;
+                }
+            }
+
+            if (toAddCount > 0) {
+                int[] newFish = new int[lanternFish.length + toAddCount];
+                System.arraycopy(lanternFish, 0, newFish, 0, lanternFish.length);
+                for (int i = 0; i < toAddCount; i++) {
+                    newFish[lanternFish.length + i] = 8;
+                }
+
+                lanternFish = newFish;
+            }
+        }
+
+        System.out.println(lanternFish.length);
+    }
+
 }

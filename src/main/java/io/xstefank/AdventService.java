@@ -780,5 +780,40 @@ public class AdventService {
         return result.toString();
     }
 
+    @GET
+    @Path("/9/1")
+    public void advent91() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("9.txt"));
+
+        int[][] smokeHeights = new int[100][100];
+
+        String line;
+        int row = 0;
+
+        while (scanner.hasNext()) {
+            line = scanner.nextLine();
+            for (int i = 0; i < line.length(); i++) {
+                smokeHeights[row][i] = Integer.parseInt(String.valueOf(line.charAt(i)));
+            }
+
+            row++;
+        }
+
+        List<Integer> results = new ArrayList<>();
+
+        for (int i = 0; i < smokeHeights.length; i++) {
+            for (int j = 0; j < smokeHeights[i].length; j++) {
+                if ((i <= 0 || smokeHeights[i - 1][j] > smokeHeights[i][j]) &&
+                    (i + 1 >= smokeHeights.length || smokeHeights[i + 1][j] > smokeHeights[i][j]) &&
+                    (j <= 0 || smokeHeights[i][j - 1] > smokeHeights[i][j]) &&
+                    (j + 1 >= smokeHeights[i].length || smokeHeights[i][j + 1] > smokeHeights[i][j])) {
+                    results.add(smokeHeights[i][j]);
+                }
+            }
+        }
+
+        System.out.println(results.stream().mapToInt(result -> result + 1).sum());
+    }
+
 
 }

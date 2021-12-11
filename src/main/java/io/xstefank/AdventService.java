@@ -624,4 +624,29 @@ public class AdventService {
 
         System.out.println(Arrays.stream(moves).min().getAsInt());
     }
+
+    @GET
+    @Path("/7/2")
+    public void advent72() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("7.txt"));
+
+        final int[] positions = Arrays.stream(scanner.nextLine().split(","))
+            .mapToInt(Integer::parseInt).toArray();
+
+        int maxPosition = Arrays.stream(positions).max()
+            .orElseThrow(() -> new RuntimeException("can't find max"));
+
+        int[] moves = new int[maxPosition + 1];
+
+        for (int i = 0; i <= maxPosition; i++) {
+            for (int j = 0; j < positions.length; j++) {
+                for (int k = 0; k <= Math.abs(positions[j] - i); k++) {
+                    moves[i] += k;
+                }
+            }
+        }
+
+        System.out.println(Arrays.stream(moves).min().getAsInt());
+    }
+
 }

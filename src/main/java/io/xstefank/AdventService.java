@@ -649,4 +649,33 @@ public class AdventService {
         System.out.println(Arrays.stream(moves).min().getAsInt());
     }
 
+    @GET
+    @Path("/8/1")
+    public void advent81() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("8.txt"));
+
+        List<Integer> digitsWithUniqueSegmentsLenghts = List.of(2, 4, 3, 7);
+
+        int signalCount = 0;
+
+        while (scanner.hasNext()) {
+            for (int i = 0; i < 11; i++) {
+                scanner.next();
+            }
+
+            for (int i = 0; i < 4; i++) {
+                int signalLength = scanner.next().length();
+                for (Integer uniqueLength : digitsWithUniqueSegmentsLenghts) {
+                    if (uniqueLength == signalLength) {
+                        signalCount++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        System.out.println(signalCount);
+
+    }
+
 }

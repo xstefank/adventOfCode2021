@@ -603,4 +603,25 @@ public class AdventService {
         System.out.println(sum);
     }
 
+    @GET
+    @Path("/7/1")
+    public void advent71() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("7.txt"));
+
+        final int[] positions = Arrays.stream(scanner.nextLine().split(","))
+            .mapToInt(Integer::parseInt).toArray();
+
+        int maxPosition = Arrays.stream(positions).max()
+            .orElseThrow(() -> new RuntimeException("can't find max"));
+
+        int[] moves = new int[maxPosition + 1];
+
+        for (int i = 0; i <= maxPosition; i++) {
+            for (int j = 0; j < positions.length; j++) {
+                moves[i] += Math.abs(positions[j] - i);
+            }
+        }
+
+        System.out.println(Arrays.stream(moves).min().getAsInt());
+    }
 }

@@ -914,6 +914,7 @@ public class AdventService {
 
         while (scanner.hasNext()) {
             line = scanner.nextLine();
+            brackets.clear();
 
             for (char c : line.toCharArray()) {
                 if (c == '(' || c == '[' || c == '{' || c == '<') {
@@ -945,4 +946,63 @@ public class AdventService {
 
         System.out.println(result);
     }
+
+    @GET
+    @Path("/10/2")
+    public void advent102() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("10.txt"));
+
+        String line;
+        Stack<Character> brackets = new Stack<>();
+        List<Long> results = new ArrayList<>();
+
+        while (scanner.hasNext()) {
+            line = scanner.nextLine();
+            brackets.clear();
+
+            try {
+                for (char c : line.toCharArray()) {
+                    if (c == '(' || c == '[' || c == '{' || c == '<') {
+                        brackets.push(c);
+                    } else if (c == ')') {
+                        if (brackets.pop() != '(') {
+                            throw new IllegalStateException();
+                        }
+                    } else if (c == ']') {
+                        if (brackets.pop() != '[') {
+                            throw new IllegalStateException();
+                        }
+                    } else if (c == '}') {
+                        if (brackets.pop() != '{') {
+                            throw new IllegalStateException();
+                        }
+                    } else if (c == '>') {
+                        if (brackets.pop() != '<') {
+                            throw new IllegalStateException();
+                        }
+                    }
+                }
+
+                // we have an incomplete line and the stack contains the remaining needed bracket to complete
+                long result = 0;
+                while (!brackets.empty()) {
+                    switch (brackets.pop()) {
+                        case '(' -> result = result * 5 + 1;
+                        case '[' -> result = result * 5 + 2;
+                        case '{' -> result = result * 5 + 3;
+                        case '<' -> result = result * 5 + 4;
+                    }
+                }
+
+                results.add(result);
+
+            } catch (IllegalStateException e) {
+                // ok, do nothing for corrupted lines
+            }
+        }
+
+        results.sort(Comparator.naturalOrder());
+        System.out.println(results.get(results.size() / 2));
+    }
+
 }

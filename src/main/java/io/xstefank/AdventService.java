@@ -902,4 +902,47 @@ public class AdventService {
         }
     }
 
+    @GET
+    @Path("/10/1")
+    public void advent101() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("10.txt"));
+
+        long result = 0;
+
+        String line;
+        Stack<Character> brackets = new Stack<>();
+
+        while (scanner.hasNext()) {
+            line = scanner.nextLine();
+
+            for (char c : line.toCharArray()) {
+                if (c == '(' || c == '[' || c == '{' || c == '<') {
+                    brackets.push(c);
+                } else if (c == ')') {
+                    if (brackets.pop() != '(') {
+                        result += 3;
+                        break;
+                    }
+                } else if (c == ']') {
+                    if (brackets.pop() != '[') {
+                        result += 57;
+                        break;
+                    }
+                } else if (c == '}') {
+                    if (brackets.pop() != '{') {
+                        result += 1197;
+                        break;
+                    }
+                } else if (c == '>') {
+                    if (brackets.pop() != '<') {
+                        result += 25137;
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        System.out.println(result);
+    }
 }

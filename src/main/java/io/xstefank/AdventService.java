@@ -1005,4 +1005,82 @@ public class AdventService {
         System.out.println(results.get(results.size() / 2));
     }
 
+    @GET
+    @Path("/11/1")
+    public void advent111() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("11.txt"));
+
+        final int size = 10;
+
+        int[][] octopuses = new int[size][size];
+        String line;
+
+        for (int i = 0; i < size; i++) {
+            line = scanner.nextLine();
+            for (int j = 0; j < size; j++) {
+                octopuses[i][j] = Integer.parseInt(String.valueOf(line.charAt(j)));
+            }
+        }
+
+        int steps = 100;
+        long flashCount = 0;
+        boolean someoneFlashed = true;
+
+        while (steps-- > 0) {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    octopuses[i][j]++;
+                }
+            }
+
+            someoneFlashed = true;
+
+            while (someoneFlashed) {
+                someoneFlashed = false;
+
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        if (octopuses[i][j] > 9) {
+                            // flash the octopus at i, j
+                            someoneFlashed = true;
+                            flashCount++;
+                            octopuses[i][j] = 0;
+                            if (i - 1 >= 0) {
+                                increaseLevel(octopuses, i - 1, j);
+                                if (j - 1 >= 0) {
+                                    increaseLevel(octopuses, i - 1, j - 1);
+                                }
+                                if (j + 1 < size) {
+                                    increaseLevel(octopuses, i - 1, j + 1);
+                                }
+                            }
+                            if (i + 1 < size) {
+                                increaseLevel(octopuses, i + 1, j);
+                                if (j - 1 >= 0) {
+                                    increaseLevel(octopuses, i + 1, j - 1);
+                                }
+                                if (j + 1 < size) {
+                                    increaseLevel(octopuses, i + 1, j + 1);
+                                }
+                            }
+                            if (j - 1 >= 0) {
+                                increaseLevel(octopuses, i, j - 1);
+                            }
+                            if (j + 1 < size) {
+                                increaseLevel(octopuses, i, j + 1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(flashCount);
+    }
+
+    private void increaseLevel(int[][] octopuses, int i, int j) {
+        if (octopuses[i][j] != 0) {
+            octopuses[i][j]++;
+        }
+    }
 }

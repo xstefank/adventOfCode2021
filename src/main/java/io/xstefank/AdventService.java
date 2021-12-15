@@ -1157,10 +1157,84 @@ public class AdventService {
         }
     }
 
-
     private void increaseLevel(int[][] octopuses, int i, int j) {
         if (octopuses[i][j] != 0) {
             octopuses[i][j]++;
         }
+    }
+
+    @GET
+    @Path("/12/1")
+    public void advent121() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("12.txt"));
+
+        Map<String, List<String>> connections = new HashMap<>();
+        String[] split;
+
+        while (scanner.hasNext()) {
+            split = scanner.nextLine().split("-");
+            if (!split[0].equals("end") && !split[1].equals("start")) {
+                connections.putIfAbsent(split[0], new ArrayList<>());
+                connections.get(split[0]).add(split[1]);
+            }
+            if (!split[1].equals("end") && !split[0].equals("start")) {
+                connections.putIfAbsent(split[1], new ArrayList<>());
+                connections.get(split[1]).add(split[0]);
+            }
+        }
+
+        List<List<String>> paths = new ArrayList<>();
+        List<String> start = new ArrayList<>();
+        start.add("start");
+        paths.add(start);
+        List<List<String>> newPaths;
+        List<String> newPath;
+
+        boolean canContinue = true;
+        String last;
+        List<String> possibleForwards;
+        List<List<String>> finalPaths = new ArrayList<>();
+
+        while (canContinue) {
+            canContinue = false;
+            newPaths = new ArrayList<>();
+            for (List<String> path : paths) {
+                last = path.get(path.size() - 1);
+                possibleForwards = connections.get(last);
+                if (possibleForwards == null) {
+                    if (last.equals("end")) {
+                        finalPaths.add(path);
+                    }
+                    continue;
+                }
+                for (String forward : possibleForwards) {
+                    if (forward.equals(forward.toLowerCase())) {
+                        // lowercase can only be visited once in any path
+                        if (wasAlreadyVisited(path, forward)) {
+                            continue;
+                        }
+                    }
+                    newPath = new ArrayList<>(path);
+                    newPath.add(forward);
+                    newPaths.add(newPath);
+                    canContinue = true;
+                }
+            }
+
+            paths = newPaths;
+        }
+
+        System.out.println(finalPaths.size());
+
+    }
+
+    private boolean wasAlreadyVisited(List<String> path, String forward) {
+        for (String pathElement : path) {
+            if (pathElement.equals(forward)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

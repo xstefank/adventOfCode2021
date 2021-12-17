@@ -1432,4 +1432,77 @@ public class AdventService {
 
         System.out.println(dotCount);
     }
+
+    @GET
+    @Path("/13/2")
+    public void advent132() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("13.txt"));
+
+        int sizeX = 1500;
+        int sizeY = 1500;
+
+        boolean[][] dots = new boolean[sizeY][sizeX];
+        String line = scanner.nextLine();
+        String[] split;
+
+        while (!line.isBlank()) {
+            split = line.split(",");
+            dots[Integer.parseInt(split[1])][Integer.parseInt(split[0])] = true;
+
+            line = scanner.nextLine();
+        }
+
+        String[] instruction;
+        int flipLine;
+
+        while (scanner.hasNext()) {
+
+            instruction = scanner.nextLine().split(" ")[2].split("=");
+
+            if (instruction[0].equals("y")) {
+                flipLine = Integer.parseInt(instruction[1]);
+                for (int y = flipLine + 1; y < sizeY; y++) {
+                    for (int x = 0; x < sizeX; x++) {
+                        if (dots[y][x]) {
+                            dots[flipLine - (y - flipLine)][x] = true;
+                        }
+                    }
+                }
+
+                sizeY = flipLine;
+                boolean[][] newDots = new boolean[sizeY][sizeX];
+                for (int y = 0; y < sizeY; y++) {
+                    System.arraycopy(dots[y], 0, newDots[y], 0, sizeX);
+                }
+                dots = newDots;
+            } else if (instruction[0].equals("x")) {
+                flipLine = Integer.parseInt(instruction[1]);
+                for (int y = 0; y < sizeY; y++) {
+                    for (int x = flipLine + 1; x < sizeX; x++) {
+                        if (dots[y][x]) {
+                            dots[y][flipLine - (x - flipLine)] = true;
+                        }
+                    }
+                }
+
+                sizeX = flipLine;
+                boolean[][] newDots = new boolean[sizeY][sizeX];
+                for (int y = 0; y < sizeY; y++) {
+                    System.arraycopy(dots[y], 0, newDots[y], 0, sizeX);
+                }
+            }
+        }
+
+
+        System.out.println();
+        for (int y = 0; y < sizeY; y++) {
+            StringBuilder sb = new StringBuilder();
+            for (int x = 0; x < sizeX; x++) {
+                sb.append(dots[y][x] ? "#" : ".");
+            }
+
+            System.out.println(sb.toString());
+        }
+    }
+
 }

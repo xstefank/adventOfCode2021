@@ -1363,4 +1363,73 @@ public class AdventService {
 
         return false;
     }
+
+    @GET
+    @Path("/13/1")
+    public void advent131() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("13.txt"));
+
+        int sizeX = 1500;
+        int sizeY = 1500;
+
+        boolean[][] dots = new boolean[sizeY][sizeX];
+        String line = scanner.nextLine();
+        String[] split;
+
+        while (!line.isBlank()) {
+            split = line.split(",");
+            dots[Integer.parseInt(split[1])][Integer.parseInt(split[0])] = true;
+
+            line = scanner.nextLine();
+        }
+
+
+        String[] firstInstruction = scanner.nextLine().split(" ")[2].split("=");
+        int flipLine;
+
+        if (firstInstruction[0].equals("y")) {
+            flipLine = Integer.parseInt(firstInstruction[1]);
+            for (int y = flipLine + 1; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    if (dots[y][x]) {
+                        dots[flipLine - (y - flipLine)][x] = true;
+                    }
+                }
+            }
+
+            sizeY = flipLine;
+            boolean[][] newDots = new boolean[sizeY][sizeX];
+            for (int y = 0; y < sizeY; y++) {
+                System.arraycopy(dots[y], 0, newDots[y], 0, sizeX);
+            }
+            dots = newDots;
+        } else if (firstInstruction[0].equals("x")) {
+            flipLine = Integer.parseInt(firstInstruction[1]);
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = flipLine + 1; x < sizeX; x++) {
+                    if (dots[y][x]) {
+                        dots[y][flipLine - (x - flipLine)] = true;
+                    }
+                }
+            }
+
+            sizeX = flipLine;
+            boolean[][] newDots = new boolean[sizeY][sizeX];
+            for (int y = 0; y < sizeY; y++) {
+                System.arraycopy(dots[y], 0, newDots[y], 0, sizeX);
+            }
+        }
+
+        int dotCount = 0;
+
+        for (int y = 0; y < sizeY; y++) {
+            for (int x = 0; x < sizeX; x++) {
+                if (dots[y][x]) {
+                    dotCount++;
+                }
+            }
+        }
+
+        System.out.println(dotCount);
+    }
 }

@@ -1505,4 +1505,64 @@ public class AdventService {
         }
     }
 
+    @GET
+    @Path("/14/1")
+    public void advent141() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("14.txt"));
+
+        String template = scanner.nextLine();
+
+        //empty line after that
+        scanner.nextLine();
+
+        Map<String, String> pairInsertions = new HashMap<>();
+        String line;
+        String[] split;
+
+        while (scanner.hasNext()) {
+            line = scanner.nextLine();
+            split = line.split(" -> ");
+            pairInsertions.put(split[0], split[1]);
+        }
+
+        int steps = 10;
+        StringBuilder newTemplateBuilder;
+
+        for (int i = 0; i < steps; i++) {
+            newTemplateBuilder = new StringBuilder();
+            newTemplateBuilder.append(template.charAt(0));
+
+            for (int j = 0; j < template.length() - 1; j++) {
+                String pair = template.substring(j, j + 2);
+                String insertion = pairInsertions.get(pair);
+                newTemplateBuilder
+                    .append(insertion)
+                    .append(pair.charAt(1));
+            }
+
+            template = newTemplateBuilder.toString();
+        }
+
+        Map<Character, Integer> occurrences = new HashMap<>();
+
+        for (char c : template.toCharArray()) {
+            occurrences.merge(c, 1, Integer::sum);
+        }
+
+        int max = 0;
+        int min = Integer.MAX_VALUE;
+
+
+        for (Integer occurrence : occurrences.values()) {
+            if (occurrence > max) {
+                max = occurrence;
+            }
+            if (occurrence < min) {
+                min = occurrence;
+            }
+        }
+
+        System.out.println(max - min);
+    }
+
 }

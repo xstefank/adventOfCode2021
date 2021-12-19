@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
@@ -1631,6 +1632,114 @@ public class AdventService {
         }
 
         System.out.println(max - min);
+    }
+
+    private static final int size = 100;
+
+    @GET
+    @Path("/15/1")
+    public void advent151() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("15.txt"));
+
+        int[][] caves = new int[size][size];
+
+        String line;
+
+        for (int i = 0; i < size; i++) {
+            line = scanner.nextLine();
+            for (int j = 0; j < size; j++) {
+                caves[i][j] = Integer.parseInt(line.substring(j, j + 1));
+            }
+        }
+
+        PriorityQueue<Point15> queue = new PriorityQueue<>(Comparator.comparing(p -> p.pathValue));
+        Set<Point15> processedPoints = new HashSet<>();
+        Map<Point15, Integer> lowestPaths = new HashMap<>();
+
+        queue.add(new Point15(0, 0));
+        Point15 endNode = new Point15(size - 1, size - 1);
+
+        while (!queue.isEmpty()) {
+            Point15 currentPoint = queue.poll();
+            processedPoints.add(currentPoint);
+            lowestPaths.put(currentPoint, currentPoint.pathValue);
+
+            if (currentPoint.equals(endNode)) {
+                break;
+            }
+
+            for (Point15 p : getNeighbours(currentPoint, processedPoints)) {
+                int currentPathValue = currentPoint.pathValue;
+                int caveValue = caves[p.i][p.j];
+
+                if (lowestPaths.get(p) == null || currentPathValue + caveValue < lowestPaths.get(p)) {
+                    lowestPaths.put(p, currentPathValue + caveValue);
+                    p.pathValue = currentPathValue + caveValue;
+                    queue.add(p);
+                }
+            }
+        }
+
+        System.out.println(lowestPaths.get(endNode));
+
+    }
+
+    private List<Point15> getNeighbours(Point15 currentPoint, Set<Point15> processedPoints) {
+        List<Point15> result = new ArrayList<>();
+        int i = currentPoint.i;
+        int j = currentPoint.j;
+        Point15 point15;
+
+        if (i - 1 >= 0) {
+            point15 = new Point15(i - 1, j);
+            if (!processedPoints.contains(point15)) {
+                result.add(point15);
+            }
+        }
+        if (i + 1 < size) {
+            point15 = new Point15(i + 1, j);
+            if (!processedPoints.contains(point15)) {
+                result.add(point15);
+            }
+        }
+        if (j - 1 >= 0) {
+            point15 = new Point15(i, j - 1);
+            if (!processedPoints.contains(point15)) {
+                result.add(point15);
+            }
+        }
+        if (j + 1 < size) {
+            point15 = new Point15(i, j + 1);
+            if (!processedPoints.contains(point15)) {
+                result.add(point15);
+            }
+        }
+
+        return result;
+    }
+
+    private static final class Point15 {
+        int i;
+        int j;
+        int pathValue;
+
+        public Point15(int i, int j) {
+            this.i = i;
+            this.j = j;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Point15)) return false;
+            Point15 point15 = (Point15) o;
+            return i == point15.i && j == point15.j;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(i, j);
+        }
     }
 
 }

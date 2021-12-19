@@ -1634,7 +1634,7 @@ public class AdventService {
         System.out.println(max - min);
     }
 
-    private static final int size = 100;
+    private static final int size = 10;
 
     @GET
     @Path("/15/1")
@@ -1684,6 +1684,80 @@ public class AdventService {
 
     }
 
+    private final static int size152 = 500;
+
+    @GET
+    @Path("/15/2")
+    public void advent152() throws IOException {
+        Scanner scanner = new Scanner(inputReader.getFile("15.txt"));
+
+        int[][] caves = new int[size152][size152];
+
+        String line;
+
+        for (int i = 0; i < size152 / 5; i++) {
+            line = scanner.nextLine();
+            for (int j = 0; j < size152 / 5; j++) {
+                caves[i][j] = Integer.parseInt(line.substring(j, j + 1));
+            }
+        }
+
+        // copy the map 5 times in both directions
+        int newValue;
+        for (int k = 0; k < 5; k++) {
+            for (int l = 0; l < 5; l++) {
+                if (k == 0 && l == 0) {
+                    continue;
+                }
+                for (int i = 0; i < size152 / 5; i++) {
+                    for (int j = 0; j < size152 / 5; j++) {
+                        newValue = computeValue(caves[i][j], k, l);
+                        caves[(k * size152 / 5) + i][(l * size152 / 5) + j] = newValue;
+                    }
+                }
+            }
+        }
+
+        PriorityQueue<Point15> queue = new PriorityQueue<>(Comparator.comparing(p -> p.pathValue));
+        Set<Point15> processedPoints = new HashSet<>();
+        Map<Point15, Integer> lowestPaths = new HashMap<>();
+
+        queue.add(new Point15(0, 0));
+        Point15 endNode = new Point15(size152 - 1, size152 - 1);
+
+        while (!queue.isEmpty()) {
+            Point15 currentPoint = queue.poll();
+            processedPoints.add(currentPoint);
+            lowestPaths.put(currentPoint, currentPoint.pathValue);
+
+            if (currentPoint.equals(endNode)) {
+                break;
+            }
+
+            for (Point15 p : getNeighbours(currentPoint, processedPoints)) {
+                int currentPathValue = currentPoint.pathValue;
+                int caveValue = caves[p.i][p.j];
+
+                if (lowestPaths.get(p) == null || currentPathValue + caveValue < lowestPaths.get(p)) {
+                    lowestPaths.put(p, currentPathValue + caveValue);
+                    p.pathValue = currentPathValue + caveValue;
+                    queue.add(p);
+                }
+            }
+        }
+
+        System.out.println(lowestPaths.get(endNode));
+    }
+
+    private int computeValue(int originalValue, int k, int l) {
+        int newValue = originalValue;
+        for (int i = 0; i < k + l; i++) {
+            newValue = newValue + 1 <= 9 ? newValue + 1: 1;
+        }
+
+        return newValue;
+    }
+
     private List<Point15> getNeighbours(Point15 currentPoint, Set<Point15> processedPoints) {
         List<Point15> result = new ArrayList<>();
         int i = currentPoint.i;
@@ -1696,7 +1770,7 @@ public class AdventService {
                 result.add(point15);
             }
         }
-        if (i + 1 < size) {
+        if (i + 1 < size152) {
             point15 = new Point15(i + 1, j);
             if (!processedPoints.contains(point15)) {
                 result.add(point15);
@@ -1708,7 +1782,7 @@ public class AdventService {
                 result.add(point15);
             }
         }
-        if (j + 1 < size) {
+        if (j + 1 < size152) {
             point15 = new Point15(i, j + 1);
             if (!processedPoints.contains(point15)) {
                 result.add(point15);

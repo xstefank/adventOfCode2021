@@ -13,7 +13,9 @@ import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 @Path("/16")
 @RequestScoped
@@ -54,14 +56,29 @@ public class AdventDay16 {
     public void part1() throws Exception {
         Scanner scanner = new Scanner(inputReader.getFile("16.txt"));
 
+        initQueue(scanner);
+
+        parsePacket();
+        System.out.println("Versions sum = " + part1VersionsSum);
+    }
+
+    @GET
+    @Path("/2")
+    public void part2() throws Exception {
+        Scanner scanner = new Scanner(inputReader.getFile("16.txt"));
+
+        initQueue(scanner);
+
+        PacketResult packetResult = parsePacket();
+        System.out.println("Final result = " + packetResult.result);
+    }
+
+    private void initQueue(Scanner scanner) {
         inputDeque = new ArrayDeque<>();
 
         for (Character c : scanner.next().toCharArray()) {
             inputDeque.add(c);
         }
-
-        parsePacket();
-        System.out.println("Versions sum = " + part1VersionsSum);
     }
 
     private PacketResult parsePacket() {
@@ -75,39 +92,61 @@ public class AdventDay16 {
         int typeId = Integer.parseInt(requestBits(3), 2);
 
         if (typeId == 4) {
-            String result = parseLiteralValuePacket();
-            System.out.println("Literal value packet " + Long.parseLong(result, 2));
+            long result = parseLiteralValuePacket();
             return new PacketResult(totalReadBitsCount - initialBitCount, result);
         } else {
             // operators
             String lengthTypeId = requestBits(1);
             if (lengthTypeId.equals("0")) {
                 int totalLengthInBits = Integer.parseInt(requestBits(15), 2);
-                String result = parseTotalLengthPacket(totalLengthInBits);
-                System.out.println(result);
+                long result = parseTotalLengthPacket(totalLengthInBits, typeId);
                 return new PacketResult(totalReadBitsCount - initialBitCount, result);
             } else {
                 int numberOfSubpackets = Integer.parseInt(requestBits(11), 2);
-                for (int i = 0; i < numberOfSubpackets; i++) {
-                    parsePacket();
-                }
-                return new PacketResult(totalReadBitsCount - initialBitCount, "");
+                long result = parseNumberOfSubpacketsPacket(numberOfSubpackets, typeId);
+                return new PacketResult(totalReadBitsCount - initialBitCount, result);
             }
         }
     }
 
-    private String parseTotalLengthPacket(int totalLengthInBits) {
+    private long parseTotalLengthPacket(int totalLengthInBits, int typeId) {
+        List<PacketResult> subpackets = new ArrayList<>();
+
         while (totalLengthInBits > 0) {
             System.out.println("Subpacket - ");
             PacketResult packetResult = parsePacket();
-
+            subpackets.add(packetResult);
             totalLengthInBits -= packetResult.size;
         }
 
-        return "";
+        return computePacketValue(subpackets, typeId);
     }
 
-    private String parseLiteralValuePacket() {
+    private long parseNumberOfSubpacketsPacket(int numberOfSubpackets, int typeId) {
+        List<PacketResult> subpackets = new ArrayList<>();
+
+        for (int i = 0; i < numberOfSubpackets; i++) {
+            subpackets.add(parsePacket());
+        }
+
+        return computePacketValue(subpackets, typeId);
+    }
+
+    private long computePacketValue(List<PacketResult> subpackets, int typeId) {
+        System.out.println("subpackets = " + subpackets + ", typeId = " + typeId);
+        return switch (typeId) {
+            case 0 -> subpackets.stream().mapToLong(pr -> pr.result).sum();
+            case 1 -> subpackets.stream().mapToLong(pr -> pr.result).reduce(1L, (a, b) -> a * b);
+            case 2 -> subpackets.stream().mapToLong(pr -> pr.result).min().orElse(-1);
+            case 3 -> subpackets.stream().mapToLong(pr -> pr.result).max().orElse(-1);
+            case 5 -> subpackets.get(0).result > subpackets.get(1).result ? 1L : 0L;
+            case 6 -> subpackets.get(0).result < subpackets.get(1).result ? 1L : 0L;
+            case 7 -> Objects.equals(subpackets.get(0).result, subpackets.get(1).result) ? 1L : 0L;
+            default -> 0L;
+        };
+    }
+
+    private long parseLiteralValuePacket() {
         boolean stillReadingPacket = true;
         StringBuilder sb = new StringBuilder();
 
@@ -116,7 +155,7 @@ public class AdventDay16 {
             sb.append(requestBits(4));
         }
 
-        return sb.toString();
+        return Long.parseLong(sb.toString(), 2);
     }
 
     private String requestBits(int number) {
@@ -141,19 +180,21 @@ public class AdventDay16 {
         return requestBits(number);
     }
 
-    @GET
-    @Path("/2")
-    public void part2() throws Exception {
-        Scanner scanner = new Scanner(inputReader.getFile("16.txt"));
-    }
-
     static final class PacketResult {
         int size;
-        List<String> results = new ArrayList<>();
+        Long result;
 
-        public PacketResult(int size, String... resultStrings) {
+        public PacketResult(int size, Long result) {
             this.size = size;
-            results.addAll(Arrays.asList(resultStrings));
+            this.result = result;
+        }
+
+        @Override
+        public String toString() {
+            return "PacketResult{" +
+                    "size=" + size +
+                    ", result=" + result +
+                    '}';
         }
     }
 }
